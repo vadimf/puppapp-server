@@ -16,7 +16,8 @@ export interface User {
   password: string;
   dateOfBirth: Date;
   about: string;
-  preferredAgeRange: { minimumAge: number, maximumAge: number };
+  preferredAgeRange: { minimumAge: number; maximumAge: number };
   pictures: File[];
   gender: Gender;
+  validatePassword: (password: string) => Promise<boolean>;
 }

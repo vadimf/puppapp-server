@@ -1,8 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './user.interface';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { DUPLICATE_KEY } from '../utils/mongo-error-codes';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -10,11 +16,39 @@ export class UsersService {
   }
   
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const createdUser = new this.userModel(createUserDto);
-    return createdUser.save();
+    const { email, password } = createUserDto;
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await this.hashPassword(password, salt);
+    
+    const createdUser = new this.userModel({ email, password: hashedPassword, salt });
+    try {
+      await createdUser.save();
+    } catch (error) {
+      if (error.code === DUPLICATE_KEY) {
+        throw new ConflictException('Email already exists');
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
+    return createdUser;
   }
   
-  async findOne(email: string): Promise<User | undefined> {
-    return this.userModel.find({ email });
+  async findOne(query: Partial<User>): Promise<User | undefined> {
+    return this.userModel.findOne(query);
+  }
+  
+  async validateUserPassword(createUserDto: CreateUserDto): Promise<string> {
+    const { email, password } = createUserDto;
+    const user = await this.findOne({ email });
+    
+    if (user && await user.validatePassword(password)) {
+      return user.email;
+    } else {
+      return null;
+    }
+  }
+  
+  async hashPassword(password: string, salt: string): Promise<string> {
+    return bcrypt.hash(password, salt);
   }
 }
