@@ -5,10 +5,11 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from './user.interface';
+import { User } from './interfaces/user.interface';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { DUPLICATE_KEY } from '../utils/mongo-error-codes';
 import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -35,6 +36,12 @@ export class UsersService {
   
   async findOne(query: Partial<User>): Promise<User | undefined> {
     return this.userModel.findOne(query);
+  }
+  
+  async updateUser(user: User, updatedUser: UpdateUserDto): Promise<User> {
+    const userDocument = await this.findOne({ _id: user._id });
+    userDocument.set(updatedUser);
+    return userDocument.save();
   }
   
   async validateUserPassword(createUserDto: CreateUserDto): Promise<string> {

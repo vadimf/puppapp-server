@@ -1,3 +1,5 @@
+import { Document } from 'mongoose';
+
 export enum Gender {
   MALE = 'MALE',
   FEMALE = 'FEMALE',
@@ -10,7 +12,7 @@ export interface File {
   thumbnail: string;
 }
 
-export interface User {
+export interface User extends Document {
   email: string;
   name: string;
   password: string;
@@ -20,4 +22,6 @@ export interface User {
   pictures: File[];
   gender: Gender;
   validatePassword: (password: string) => Promise<boolean>;
+  createdAt: Date;
+  updatedAt: Date;
 }

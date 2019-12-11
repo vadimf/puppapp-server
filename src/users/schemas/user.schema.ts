@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { Gender } from './user.interface';
+import { Gender } from '../interfaces/user.interface';
 import * as bcrypt from 'bcrypt';
 
 export const AgeRangeSchema = new Schema(
@@ -26,6 +26,8 @@ export const UserSchema = new Schema({
   preferredAgeRange: { type: AgeRangeSchema, default: {} },
   pictures: [FileSchema],
   gender: { type: String, default: Gender.MALE },
+}, {
+  timestamps: true,
 });
 
 UserSchema.methods.validatePassword = async function(
