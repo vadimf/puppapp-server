@@ -22,9 +22,7 @@ export class UsersService {
     let newUser;
     
     if (createUserDto.password) {
-      const salt = await bcrypt.genSalt();
-      const hashedPassword = await this.hashPassword(createUserDto.password, salt);
-      newUser = new this.userModel({ email, password: hashedPassword, salt });
+      newUser = new this.userModel({ email, password: createUserDto.password });
     } else {
       newUser = new this.userModel({ email, facebookId: createUserDto.facebookId });
     }
@@ -53,16 +51,12 @@ export class UsersService {
   
   async validateUserPassword(createUserDto: CreateUserDto): Promise<User> {
     const { email, password } = createUserDto;
-    const user = await this.findOne({ email });
+    const user = await this.findOne({ email: email.toLowerCase() });
     
     if (user && await user.validatePassword(password)) {
       return user;
     } else {
       return null;
     }
-  }
-  
-  async hashPassword(password: string, salt: string): Promise<string> {
-    return bcrypt.hash(password, salt);
   }
 }
