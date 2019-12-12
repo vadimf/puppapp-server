@@ -11,14 +11,14 @@ import { ConfigService } from '../config/config.service';
   imports: [MongooseModule.forRootAsync(
     {
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get('MONGODB_URI'),
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
       }),
-      inject: [ConfigService],
-    }), AuthModule, UsersModule, ConfigModule],
+    }), AuthModule, UsersModule],
   controllers: [AppController],
   providers: [AppService],
 })

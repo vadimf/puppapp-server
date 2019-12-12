@@ -17,10 +17,11 @@ export const FileSchema = new Schema({
 });
 
 export const UserSchema = new Schema({
-  name: { type: String, default: null },
+  facebookId: String,
   email: { type: String, unique: true },
   password: String,
   salt: String,
+  name: { type: String, default: null },
   dateOfBirth: { type: Date, default: null },
   about: { type: String, default: null },
   preferredAgeRange: { type: AgeRangeSchema, default: {} },
@@ -39,6 +40,7 @@ UserSchema.methods.validatePassword = async function(
 
 UserSchema.methods.toJSON = function() {
   return {
+    id: this._id,
     name: this.name,
     email: this.email,
     dateOfBirth: this.dateOfBirth,

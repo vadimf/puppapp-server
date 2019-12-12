@@ -8,3 +8,10 @@ export class CreateUserDto {
   @MaxLength(20)
   readonly password: string;
 }
+
+export class CreateUserFromFacebookDto {
+  @IsEmail()
+  readonly email: string;
+  @IsString()
+  readonly facebookId: string;
+}

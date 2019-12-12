@@ -6,7 +6,7 @@ import {
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './interfaces/user.interface';
-import { CreateUserDto } from './dtos/create-user.dto';
+import { CreateUserDto, CreateUserFromFacebookDto } from './dtos/create-user.dto';
 import { DUPLICATE_KEY } from '../utils/mongo-error-codes';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -16,14 +16,21 @@ export class UsersService {
   constructor(@InjectModel('User') private readonly userModel: Model<User>) {
   }
   
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const { email, password } = createUserDto;
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await this.hashPassword(password, salt);
+  async create(createUserDto: CreateUserDto | CreateUserFromFacebookDto): Promise<User> {
+    const { email } = createUserDto;
     
-    const createdUser = new this.userModel({ email, password: hashedPassword, salt });
+    let newUser;
+    
+    if (createUserDto instanceof CreateUserDto) {
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await this.hashPassword(createUserDto.password, salt);
+      newUser = new this.userModel({ email, password: hashedPassword, salt });
+    } else {
+      newUser = new this.userModel({ email, facebookId: createUserDto.facebookId });
+    }
+    
     try {
-      await createdUser.save();
+      await newUser.save();
     } catch (error) {
       if (error.code === DUPLICATE_KEY) {
         throw new ConflictException('Email already exists');
@@ -31,10 +38,10 @@ export class UsersService {
         throw new InternalServerErrorException();
       }
     }
-    return createdUser;
+    return newUser;
   }
   
-  async findOne(query: Partial<User>): Promise<User | undefined> {
+  async findOne(query: any): Promise<User | undefined> {
     return this.userModel.findOne(query);
   }
   

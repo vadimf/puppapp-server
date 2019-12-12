@@ -14,7 +14,7 @@ async function bootstrap() {
       max: 100,
     }),
   );
-  await app.listen(3000);
+  await app.listen(app.get('ConfigService').get('PORT'));
 }
 
 bootstrap();
