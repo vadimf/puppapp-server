@@ -6,7 +6,7 @@ import {
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './interfaces/user.interface';
-import { CreateUserDto, CreateUserFromFacebookDto } from './dtos/create-user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
 import { DUPLICATE_KEY } from '../utils/mongo-error-codes';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -16,13 +16,15 @@ export class UsersService {
   constructor(@InjectModel('User') private readonly userModel: Model<User>) {
   }
   
-  async create(createUserDto: CreateUserDto | CreateUserFromFacebookDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     const { email } = createUserDto;
     
     let newUser;
     
-    if (createUserDto instanceof CreateUserDto) {
-      newUser = new this.userModel({ email, password: createUserDto.password });
+    if (createUserDto.password) {
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await this.hashPassword(createUserDto.password, salt);
+      newUser = new this.userModel({ email, password: hashedPassword, salt });
     } else {
       newUser = new this.userModel({ email, facebookId: createUserDto.facebookId });
     }
@@ -49,14 +51,18 @@ export class UsersService {
     return userDocument.save();
   }
   
-  async validateUserPassword(createUserDto: CreateUserDto): Promise<string> {
+  async validateUserPassword(createUserDto: CreateUserDto): Promise<User> {
     const { email, password } = createUserDto;
     const user = await this.findOne({ email });
     
     if (user && await user.validatePassword(password)) {
-      return user.email;
+      return user;
     } else {
       return null;
     }
+  }
+  
+  async hashPassword(password: string, salt: string): Promise<string> {
+    return bcrypt.hash(password, salt);
   }
 }

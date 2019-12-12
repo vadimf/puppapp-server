@@ -13,6 +13,7 @@ import { randomStringGenerator } from '@nestjs/common/utils/random-string-genera
 import { MailerService } from '@nest-modules/mailer';
 import { ConfigService } from '../config/config.service';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { User } from '../users/interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -24,20 +25,24 @@ export class AuthService {
   ) {
   }
   
-  async signUp(createUserDto: CreateUserDto) {
-    return await this.usersService.create(createUserDto);
+  async signUp(createUserDto: CreateUserDto): Promise<{ user: User, accessToken: string }> {
+    const user = await this.usersService.create(createUserDto);
+    const payload: JwtPayload = { email: user.email };
+    const accessToken = await this.jwtService.sign(payload);
+    
+    return { user, accessToken };
   }
   
-  async login(createUserDto: CreateUserDto): Promise<{ accessToken: string }> {
-    const email = await this.usersService.validateUserPassword(createUserDto);
-    if (!email) {
+  async login(createUserDto: CreateUserDto): Promise<{ user: User, accessToken: string }> {
+    const user = await this.usersService.validateUserPassword(createUserDto);
+    if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
     
-    const payload: JwtPayload = { email };
+    const payload: JwtPayload = { email: user.email };
     const accessToken = await this.jwtService.sign(payload);
     
-    return { accessToken };
+    return { user, accessToken };
   }
   
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {

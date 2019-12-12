@@ -4,8 +4,7 @@ import * as FacebookTokenStrategy from 'passport-facebook-token';
 import { use } from 'passport';
 import { ConfigService } from '../../config/config.service';
 import { Profile } from 'passport-facebook-token';
-import { User } from '../../users/interfaces/user.interface';
-import { CreateUserFromFacebookDto } from '../../users/dtos/create-user.dto';
+import { CreateUserDto } from '../../users/dtos/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
@@ -39,7 +38,7 @@ export class FacebookStrategy {
           });
           
           if (!user) {
-            const userFromFacebookDto: CreateUserFromFacebookDto = {
+            const userFromFacebookDto: CreateUserDto = {
               email: profile._json.email,
               facebookId: profile.id,
             };
