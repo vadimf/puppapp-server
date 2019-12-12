@@ -31,7 +31,8 @@
     "object-literal-sort-keys": false,
     "trailing-comma": false,
     "no-trailing-whitespace": false,
-    "max-classes-per-file": false
+    "max-classes-per-file": false,
+    "only-arrow-functions": false
   },
   "rulesDirectory": []
 }

@@ -1,14 +1,13 @@
 import { File, Gender } from '../interfaces/user.interface';
-import { IsArray, IsDate, IsDateString, IsEnum, IsNotEmptyObject, IsString, Max, Min, MinLength } from 'class-validator';
+import { IsArray, IsDateString, IsEnum, IsNotEmptyObject, IsString, Max, Min, MinLength } from 'class-validator';
 
 class PreferredAgeDto {
   @Min(0)
   @Max(99)
   minimumAge: number;
-  @Min(this.minimumAge)
+  @Min(0)
   @Max(99)
   maximumAge: number;
-  
 }
 
 export class UpdateUserDto {

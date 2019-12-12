@@ -36,3 +36,15 @@ UserSchema.methods.validatePassword = async function(
   const hash = await bcrypt.hash(password, this.salt);
   return hash === this.password;
 };
+
+UserSchema.methods.toJSON = function() {
+  return {
+    name: this.name,
+    email: this.email,
+    dateOfBirth: this.dateOfBirth,
+    about: this.about,
+    preferredAgeRange: this.preferredAgeRange,
+    pictures: this.pictures,
+    gender: this.gender,
+  };
+};
