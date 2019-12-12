@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
@@ -7,6 +12,7 @@ import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
 import { MailerService } from '@nest-modules/mailer';
 import { ConfigService } from '../config/config.service';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,16 +49,36 @@ export class AuthService {
     }
     
     const resetPasswordToken = randomStringGenerator();
-    user.resetPasswordTokens = [...user.resetPasswordTokens, resetPasswordToken];
+    user.resetPasswordTokens = [
+      ...user.resetPasswordTokens,
+      resetPasswordToken,
+    ];
     
-    await this.mailerService
-      .sendMail({
-        to: email,
-        subject: 'Forgot your password?',
-        template: 'forgot-password-email',
-        context: {
-          resetPasswordUri: `${this.configService.get('API_URI')}/auth/reset-password?token=${resetPasswordToken}`,
-        },
-      });
+    await user.save();
+    
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Forgot your password?',
+      template: 'forgot-password-email',
+      context: {
+        resetPasswordUri: `${this.configService.get(
+          'API_URI',
+        )}/auth/reset-password?token=${resetPasswordToken}`,
+      },
+    });
+  }
+  
+  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<string> {
+    const { password, confirmPassword, token } = resetPasswordDto;
+    
+    if (password === confirmPassword) {
+      const user = await this.usersService.findOne({ resetPasswordTokens: token });
+      user.set({ password });
+      await user.save();
+    } else {
+      throw new BadRequestException('Passwords don\'t match');
+    }
+    
+    return 'reset-password-successful';
   }
 }

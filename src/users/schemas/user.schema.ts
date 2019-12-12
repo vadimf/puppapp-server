@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { Gender } from '../interfaces/user.interface';
+import { Gender, User } from '../interfaces/user.interface';
 import * as bcrypt from 'bcrypt';
 
 export const AgeRangeSchema = new Schema(
@@ -16,21 +16,24 @@ export const FileSchema = new Schema({
   thumbnail: String,
 });
 
-export const UserSchema = new Schema({
-  facebookId: String,
-  email: { type: String, unique: true },
-  password: String,
-  salt: String,
-  name: { type: String, default: null },
-  dateOfBirth: { type: Date, default: null },
-  about: { type: String, default: null },
-  preferredAgeRange: { type: AgeRangeSchema, default: {} },
-  pictures: [FileSchema],
-  resetPasswordTokens: [String],
-  gender: { type: String, default: Gender.MALE },
-}, {
-  timestamps: true,
-});
+export const UserSchema = new Schema(
+  {
+    facebookId: String,
+    email: { type: String, unique: true },
+    password: String,
+    salt: String,
+    name: { type: String, default: null },
+    dateOfBirth: { type: Date, default: null },
+    about: { type: String, default: null },
+    preferredAgeRange: { type: AgeRangeSchema, default: {} },
+    pictures: [FileSchema],
+    resetPasswordTokens: [String],
+    gender: { type: String, default: Gender.MALE },
+  },
+  {
+    timestamps: true,
+  },
+);
 
 UserSchema.methods.validatePassword = async function(
   password: string,
@@ -51,3 +54,18 @@ UserSchema.methods.toJSON = function() {
     gender: this.gender,
   };
 };
+
+UserSchema.pre<User>('save', async function(next) {
+  this.email = this.email.toLowerCase();
+  
+  if (this.isModified('password')) {
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(this.password, salt);
+    this.salt = salt;
+    this.password = hashedPassword;
+    this.resetPasswordTokens = [];
+    next();
+  } else {
+    next();
+  }
+});

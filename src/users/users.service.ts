@@ -22,9 +22,7 @@ export class UsersService {
     let newUser;
     
     if (createUserDto instanceof CreateUserDto) {
-      const salt = await bcrypt.genSalt();
-      const hashedPassword = await this.hashPassword(createUserDto.password, salt);
-      newUser = new this.userModel({ email, password: hashedPassword, salt });
+      newUser = new this.userModel({ email, password: createUserDto.password });
     } else {
       newUser = new this.userModel({ email, facebookId: createUserDto.facebookId });
     }
@@ -60,9 +58,5 @@ export class UsersService {
     } else {
       return null;
     }
-  }
-  
-  async hashPassword(password: string, salt: string): Promise<string> {
-    return bcrypt.hash(password, salt);
   }
 }

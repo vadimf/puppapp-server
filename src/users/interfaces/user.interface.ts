@@ -16,6 +16,7 @@ export interface User extends Document {
   email: string;
   name: string;
   password: string;
+  salt: string;
   dateOfBirth: Date;
   about: string;
   preferredAgeRange: { minimumAge: number; maximumAge: number };

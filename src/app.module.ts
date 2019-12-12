@@ -6,6 +6,7 @@ import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { EventsModule } from './events/events.module';
 import { PugAdapter, MailerModule } from '@nest-modules/mailer';
+import { config } from 'rxjs';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { PugAdapter, MailerModule } from '@nest-modules/mailer';
     MailerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        transport: 'smtps://dev@globalbit.co.il:globalbit123@smtp.gmail.com',
+        transport: configService.get('EMAIL_PROVIDER'),
         defaults: {
           from: '"Globalbit" <dev@globalbit.io>',
         },
