@@ -24,4 +24,5 @@ export interface User extends Document {
   validatePassword: (password: string) => Promise<boolean>;
   createdAt: Date;
   updatedAt: Date;
+  resetPasswordTokens: string[];
 }

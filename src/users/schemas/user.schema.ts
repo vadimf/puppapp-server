@@ -26,6 +26,7 @@ export const UserSchema = new Schema({
   about: { type: String, default: null },
   preferredAgeRange: { type: AgeRangeSchema, default: {} },
   pictures: [FileSchema],
+  resetPasswordTokens: [String],
   gender: { type: String, default: Gender.MALE },
 }, {
   timestamps: true,

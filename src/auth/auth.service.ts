@@ -1,14 +1,20 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { ForgotPasswordDto } from './dtos/forgot-password.dto';
+import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
+import { MailerService } from '@nest-modules/mailer';
+import { ConfigService } from '../config/config.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
   ) {
   }
   
@@ -26,5 +32,27 @@ export class AuthService {
     const accessToken = await this.jwtService.sign(payload);
     
     return { accessToken };
+  }
+  
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+    const { email } = forgotPasswordDto;
+    
+    const user = await this.usersService.findOne({ email });
+    if (!user) {
+      throw new NotFoundException('Email not found');
+    }
+    
+    const resetPasswordToken = randomStringGenerator();
+    user.resetPasswordTokens = [...user.resetPasswordTokens, resetPasswordToken];
+    
+    await this.mailerService
+      .sendMail({
+        to: email,
+        subject: 'Forgot your password?',
+        template: 'forgot-password-email',
+        context: {
+          resetPasswordUri: `${this.configService.get('API_URI')}/auth/reset-password?token=${resetPasswordToken}`,
+        },
+      });
   }
 }
