@@ -20,7 +20,6 @@ async function bootstrap() {
     }),
   );
   app.useWebSocketAdapter(new RedisIoAdapter(app));
-  app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('pug');
   await app.listen(app.get('ConfigService').get('PORT'));
