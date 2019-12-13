@@ -6,5 +6,5 @@ ssh root@dev.globalbit.io << EOF
     yarn
     git reset --hard
     yarn build
-    pm2 restart puppapp --update-env
+    pm2 restart pm2.json
 EOF
