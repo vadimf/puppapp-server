@@ -1,8 +1,8 @@
 {
-  "name": "puppapp-nest",
+  "name": "puppapp-server",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Globalbit",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",

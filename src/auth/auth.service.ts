@@ -25,7 +25,7 @@ export class AuthService {
   ) {
   }
   
-  async signUp(createUserDto: CreateUserDto): Promise<{ user: User, accessToken: string }> {
+  async signUp(createUserDto: CreateUserDto): Promise<{ user: User; accessToken: string }> {
     const user = await this.usersService.create(createUserDto);
     const payload: JwtPayload = { email: user.email };
     const accessToken = await this.jwtService.sign(payload);
@@ -33,7 +33,7 @@ export class AuthService {
     return { user, accessToken };
   }
   
-  async login(createUserDto: CreateUserDto): Promise<{ user: User, accessToken: string }> {
+  async login(createUserDto: CreateUserDto): Promise<{ user: User; accessToken: string }> {
     const user = await this.usersService.validateUserPassword(createUserDto);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -54,10 +54,7 @@ export class AuthService {
     }
     
     const resetPasswordToken = randomStringGenerator();
-    user.resetPasswordTokens = [
-      ...user.resetPasswordTokens,
-      resetPasswordToken,
-    ];
+    user.resetPasswordTokens = [...user.resetPasswordTokens, resetPasswordToken];
     
     await user.save();
     
@@ -77,7 +74,9 @@ export class AuthService {
     const { password, confirmPassword, token } = resetPasswordDto;
     
     if (password === confirmPassword) {
-      const user = await this.usersService.findOne({ resetPasswordTokens: token });
+      const user = await this.usersService.findOne({
+        resetPasswordTokens: token,
+      });
       user.set({ password });
       await user.save();
     } else {
