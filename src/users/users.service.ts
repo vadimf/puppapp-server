@@ -8,7 +8,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './interfaces/user.interface';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { DUPLICATE_KEY } from '../utils/mongo-error-codes';
-import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Injectable()

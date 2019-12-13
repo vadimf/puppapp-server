@@ -12,7 +12,7 @@ export class EventsGateway {
   server: Server;
   
   @SubscribeMessage('events')
-  handleEvent(@MessageBody() data: any): string {
+  handleEvent(@MessageBody() data: any): any {
     return data;
   }
 }
