@@ -10,9 +10,10 @@ import { Server } from 'socket.io';
 export class EventsGateway {
   @WebSocketServer()
   server: Server;
-  
+
   @SubscribeMessage('events')
   handleEvent(@MessageBody() data: any): any {
-    return data;
+    console.log(data);
+    return 'world';
   }
 }

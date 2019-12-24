@@ -1,4 +1,5 @@
 import { Document } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 export enum Gender {
   MALE = 'MALE',
@@ -13,6 +14,7 @@ export interface File {
 }
 
 export interface User extends Document {
+  _id: ObjectId;
   email: string;
   name: string;
   password: string;

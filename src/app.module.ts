@@ -26,10 +26,10 @@ import { config } from 'rxjs';
       useFactory: async (configService: ConfigService) => ({
         transport: configService.get('EMAIL_PROVIDER'),
         defaults: {
-          from: '"Globalbit" <dev@globalbit.io>',
+          from: configService.get('EMAIL_FROM'),
         },
         template: {
-          dir: 'src/templates',
+          dir: 'src/emails',
           adapter: new PugAdapter(),
           options: {
             strict: true,

@@ -61,7 +61,7 @@ export class AuthService {
     await this.mailerService.sendMail({
       to: email,
       subject: 'Forgot your password?',
-      template: 'forgot-password-email',
+      template: 'forgot-password',
       context: {
         resetPasswordUri: `${this.configService.get(
           'API_URI',

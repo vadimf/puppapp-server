@@ -19,10 +19,11 @@ async function bootstrap() {
       max: 100,
     }),
   );
-  app.useWebSocketAdapter(new RedisIoAdapter(app));
+  const configService = app.get('ConfigService');
+  app.useWebSocketAdapter(new RedisIoAdapter(app, configService));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('pug');
-  await app.listen(app.get('ConfigService').get('PORT'));
+  await app.listen(configService.get('PORT'));
 }
 
 bootstrap();
