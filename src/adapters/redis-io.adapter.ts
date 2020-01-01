@@ -5,7 +5,7 @@ import { ConfigService } from '../config/config.service';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 export class RedisIoAdapter extends IoAdapter {
-  private redisAdapter;
+  private readonly redisAdapter;
 
   constructor(
     private readonly app: NestExpressApplication,

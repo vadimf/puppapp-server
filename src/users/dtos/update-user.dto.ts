@@ -1,5 +1,14 @@
 import { File, Gender } from '../interfaces/user.interface';
-import { IsArray, IsDateString, IsEnum, IsNotEmptyObject, IsString, Max, Min, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsDateString,
+  IsEnum,
+  IsString,
+  Max,
+  Min,
+  MinLength,
+  ValidateNested,
+} from 'class-validator';
 import { MAX_PREFERRED_AGE, MIN_NAME_LENGTH, MIN_PREFERRED_AGE } from '../../utils/constants';
 
 class PreferredAgeDto {
@@ -19,7 +28,7 @@ export class UpdateUserDto {
   dateOfBirth: Date;
   @IsString()
   about: string;
-  @IsNotEmptyObject()
+  @ValidateNested()
   preferredAgeRange: PreferredAgeDto;
   @IsArray()
   pictures: File[];
