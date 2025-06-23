@@ -67,4 +67,4 @@ DevSecOps & CI/CD automation
 This backend is a small example of how Globalbit builds mission-critical infrastructure for mobile experiences at scale.
 
 📩 Contact: info@globalbit.co.il
-🌐 Website: [globalbit.co.il](globalbit.co.il)
+🌐 Website: [globalbit.co.il](https://globalbit.co.il)
